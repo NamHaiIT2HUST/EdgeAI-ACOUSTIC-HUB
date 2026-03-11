@@ -1,0 +1,69 @@
+@startuml
+autonumber
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+
+title LƯU ĐỒ LUỒNG DỮ LIỆU (DATA FLOW) - EDGE AI ACOUSTIC HUB
+
+box "Phân hệ Biên (Edge Computing)" #E8F4F8
+    participant "Cảm biến\n(KY-038 / DHT11)" as Sensor
+    participant "ESP32-S3\n(C/C++ & RTOS)" as ESP32
+    participant "Edge Impulse\n(TinyML)" as AI
+    participant "Module Relay" as Relay
+end box
+
+box "Phân hệ Server & Ứng dụng" #FDF8E7
+    participant "Mosquitto MQTT\n(Docker)" as Broker
+    participant "Python Backend\n(SQLAlchemy)" as Backend
+    database "SQLite\nDatabase" as DB
+    participant "PyQt Desktop\n(GUI)" as GUI
+end box
+
+== LUỒNG 1: TỰ ĐỘNG NHẬN DIỆN ÂM THANH & ĐỒNG BỘ TRẠNG THÁI ==
+
+Sensor -> ESP32: Tín hiệu Analog liên tục (ADC)
+activate ESP32
+ESP32 -> ESP32: Đẩy dữ liệu vào Ring Buffer (Pointer)
+ESP32 -> AI: Đưa mảng dữ liệu vào suy luận
+activate AI
+AI --> ESP32: Trả kết quả (VD: "Tiếng vỗ tay", Độ tin cậy: 92%)
+deactivate AI
+
+opt Độ tin cậy > 85%
+    ESP32 -> Relay: Kích hoạt GPIO (Đóng/Ngắt dòng điện)
+    
+    ESP32 -> Broker: Publish JSON {event: "clap", relay_state: "ON"}
+    activate Broker
+    
+    Broker -> Backend: Forward bản tin (Subscribe)
+    activate Backend
+    
+    Backend -> DB: SQLAlchemy ORM Parse JSON & Ghi vào DB
+    activate DB
+    DB --> Backend: Xác nhận lưu thành công
+    deactivate DB
+    deactivate Backend
+    deactivate Broker
+    
+    GUI -> DB: Truy vấn định kỳ (Query Event Logs)
+    activate DB
+    DB --> GUI: Trả về bản ghi mới nhất
+    deactivate DB
+    GUI -> GUI: Cập nhật Table Log trên màn hình hiển thị
+end
+
+== LUỒNG 2: ĐIỀU KHIỂN THỦ CÔNG TỪ GIAO DIỆN (MANUAL OVERRIDE) ==
+
+GUI -> Broker: Người dùng click -> Publish lệnh {command: "toggle_relay"}
+activate Broker
+Broker -> ESP32: Forward bản tin lệnh tới ESP32 (Subscribe)
+ESP32 -> Relay: Ghi đè trạng thái Relay bằng GPIO
+ESP32 -> Broker: Publish JSON xác nhận trạng thái cập nhật
+Broker -> Backend: Forward bản tin cập nhật
+activate Backend
+Backend -> DB: Lưu Log cập nhật (Override) vào DB
+deactivate Backend
+deactivate Broker
+deactivate ESP32
+
+@enduml

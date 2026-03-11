@@ -1,0 +1,33 @@
+EdgeAI_Acoustic_Hub/
+├── firmware/                 # Chứa toàn bộ project ESP-IDF (C/C++)
+│   ├── main/                 # Source code chính
+│   │   ├── main.c            # File khởi chạy hệ thống
+│   │   ├── wifi_mqtt.c       # Xử lý kết nối Wi-Fi & MQTT
+│   │   └── ai_inference.cpp  # Xử lý suy luận AI (TinyML)
+│   ├── components/           # Các thư viện/driver tự viết (DHT11, v.v.)
+│   ├── CMakeLists.txt
+│   └── sdkconfig             # File cấu hình của ESP-IDF
+│
+├── server/                   # Chứa Backend, Database và Docker
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── models.py         # Định nghĩa bảng Database (SQLAlchemy)
+│   │   ├── mqtt_client.py    # Nhận bản tin từ ESP32
+│   │   └── database.py       # Cấu hình kết nối SQLite/Postgres
+│   ├── dashboard/            # Giao diện giám sát (PyQt)
+│   │   └── main_gui.py
+│   ├── docker-compose.yml    # Khởi chạy Mosquitto Broker & DB
+│   ├── mosquitto.conf        # Cấu hình cho MQTT Broker
+│   └── requirements.txt      # Các thư viện Python cần thiết
+│
+├── ai_model/                 # Lưu trữ mô hình và dữ liệu train
+│   ├── dataset/              # Các file .wav hoặc .csv thu thập được
+│   └── exported_model/       # Thư viện C++ xuất từ Edge Impulse
+│
+├── docs/                     # Tài liệu thiết kế (PlantUML, Eraser)
+│   ├── architecture.png
+│   ├── dataflow.puml
+│   ├── Folder_Tree.txt
+│   └── Mô tả cơ bản ý tưởng ban đầu.pdf
+│
+└── README.md                 # Tài liệu hướng dẫn sử dụng tổng thể
