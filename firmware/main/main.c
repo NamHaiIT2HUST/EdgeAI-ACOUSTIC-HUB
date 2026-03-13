@@ -21,7 +21,7 @@ void app_main(void) {
     //Cấu hình Channel
     adc_oneshot_chan_cfg_t chan_cfg = {
         .bitwidth = ADC_BITWIDTH_12, //12-bit (0-4095)
-        .atten = ADC_ATTEN_DB_12,    //Đo dải 0-3.3V
+        .atten = ADC_ATTEN_DB_12,    
     };
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, ADC_CHAN, &chan_cfg));
 
