@@ -31,3 +31,6 @@ allow_anonymous true: Tối ưu hóa tốc độ kết nối trong giai đoạn 
 docker-compose.yml
 
 Port Mapping: Map cổng 1883 (MQTT) và 9001 (WebSockets). Việc mở cổng 9001 là bước chuẩn bị cực kỳ quan trọng để Web Dashboard (Phase 4) có thể nhận dữ liệu real-time trực tiếp từ trình duyệt.
+
+
+# Phase 4:
