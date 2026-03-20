@@ -1,0 +1,4 @@
+venv_win/
+__pycache__/
+*.db
+.DS_Store
